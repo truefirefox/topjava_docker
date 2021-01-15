@@ -1,6 +1,7 @@
 {
   "id": 0,
-  "calories": 510,
-  "dateTime": "2020-01-31T21:00:00",
-  "description": "Новый Ужин"
+  "date": "2020-01-30",
+  "time": "23:00:00",
+  "description": "Новый Ужин",
+  "calories": 500
 }

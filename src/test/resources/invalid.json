@@ -1,6 +1,7 @@
 {
-  "id": 7,
-  "calories": 0,
-  "dateTime": "2020-01-31T21:00:00",
-  "description": ""
+  "id": 3,
+  "date": "2020-01-30",
+  "time": "20:00:00",
+  "description": "",
+  "calories": 0
 }

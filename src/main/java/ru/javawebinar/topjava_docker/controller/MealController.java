@@ -4,9 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import ru.javawebinar.topjava_docker.TopjavaDockerApplication;
@@ -16,6 +18,8 @@ import ru.javawebinar.topjava_docker.service.MealService;
 import ru.javawebinar.topjava_docker.to.MealTo;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,6 +62,15 @@ public class MealController {
     public List<MealTo> getAll() {
         log.info("getAll");
         return mealService.getAll();
+    }
+
+    @GetMapping("/between")
+    public List<MealTo> getBetween(@RequestParam @Nullable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                   @RequestParam @Nullable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+                                   @RequestParam @Nullable @DateTimeFormat(pattern = "HH:mm") LocalTime startTime,
+                                   @RequestParam @Nullable @DateTimeFormat(pattern = "HH:mm") LocalTime endTime) {
+        log.info("getAllBetween");
+        return mealService.getBetween(startDate, endDate, startTime, endTime);
     }
 
     @ExceptionHandler({NotFoundException.class, EmptyResultDataAccessException.class})

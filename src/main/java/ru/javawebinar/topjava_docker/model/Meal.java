@@ -1,13 +1,12 @@
 package ru.javawebinar.topjava_docker.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @Data
@@ -24,17 +23,17 @@ public class Meal{
     @Min(2)
     int calories;
 
-    @Column(name = "date_time", nullable = false)
+    @Column(name = "created_date", nullable = false)
     @NotNull
-    LocalDateTime dateTime;
+    LocalDate date;
+
+    @Column(name = "created_time", nullable = false)
+    @NotNull
+    LocalTime time;
+
 
     @Column(name = "description", nullable = false)
     @NotBlank
     @Size(min = 2, max = 120)
     String description;
-
-    @JsonIgnore
-    public LocalDate getDate() {
-        return dateTime.toLocalDate();
-    }
 }

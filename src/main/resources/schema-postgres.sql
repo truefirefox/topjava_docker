@@ -3,7 +3,8 @@ DROP TABLE IF EXISTS meals;
 CREATE TABLE meals
 (
     id          serial PRIMARY KEY,
-    date_time   TIMESTAMP NOT NULL,
+    created_date        DATE NOT NULL,
+    created_time        TIME NOT NULL ,
     description TEXT      NOT NULL,
     calories    INT       NOT NULL
 );

@@ -1,0 +1,18 @@
+[
+  {
+    "id": 7,
+    "date": "2020-01-31",
+    "time": "20:00:00",
+    "description": "Ужин",
+    "calories": 510,
+    "excess": true
+  },
+  {
+    "id": 3,
+    "date": "2020-01-30",
+    "time": "20:00:00",
+    "description": "Ужин",
+    "calories": 500,
+    "excess": false
+  }
+]

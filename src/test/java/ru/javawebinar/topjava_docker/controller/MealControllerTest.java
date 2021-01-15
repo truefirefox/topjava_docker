@@ -68,6 +68,30 @@ public class MealControllerTest {
     }
 
     @Test
+    public void shouldGetAllFiltered() throws Exception {
+        String result = Files.readString(Path.of("src/test/resources/getAllBetween.json"));
+        this.mockMvc.perform(get("/meals/between")
+                .param("startDate", "2020-01-30")
+                .param("startTime", "19:00")
+                .param("endDate", "2020-01-31")
+                .param("endTime", "22:00"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().json(result));
+    }
+
+    @Test
+    public void shouldGetAllFilteredWithNullTime() throws Exception {
+        String result = Files.readString(Path.of("src/test/resources/getAll.json"));
+        this.mockMvc.perform(get("/meals/between")
+                .param("startDate", "2020-01-30")
+                .param("endTime", "22:00"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().json(result));
+    }
+
+    @Test
     public void shouldDelete() throws Exception {
         this.mockMvc.perform(delete("/meals/7"))
                 .andDo(print())
