@@ -4,6 +4,8 @@ services:
     container_name: app-topjava-docker
     image: app-topjava-docker
     build: ./
+    environment:
+    - spring.datasource.url=jdbc:postgresql://dbpostgresql:5432/topjavadocker
     ports:
     - "8080:8080"
     depends_on:

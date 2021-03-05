@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava_docker.model.Meal;
 
 import java.time.LocalDate;
@@ -12,6 +13,7 @@ import java.time.LocalDate;
 @Repository
 public interface MealRepository extends PagingAndSortingRepository<Meal, Long> {
 
+    @Transactional(readOnly = true)
     @Query("SELECT m from Meal m WHERE " +
             "(coalesce(:startDate, null) IS NULL OR m.date >= :startDate) AND " +
             "(coalesce(:endDate, null) IS NULL OR m.date <= :endDate)")
