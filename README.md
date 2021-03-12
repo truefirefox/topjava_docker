@@ -6,4 +6,4 @@ springboot postgres docker
    1. docker-compose.yml  
 3. собрать jar 
 4. в терминале из корневого каталога "docker-compose up --build"
-5. открыть http://localhost:8080/topjavaswagger.html
+5. открыть http://localhost:8080/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config

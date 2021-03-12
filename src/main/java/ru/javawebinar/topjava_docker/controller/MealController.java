@@ -1,5 +1,7 @@
 package ru.javawebinar.topjava_docker.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import ru.javawebinar.topjava_docker.TopjavaDockerApplication;
@@ -25,6 +29,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/meals", produces = MediaType.APPLICATION_JSON_VALUE)
+@SecurityRequirement(name = "bearer-key")
 public class MealController {
     private static final Logger log = LoggerFactory.getLogger(TopjavaDockerApplication.class);
     private MealService mealService;
@@ -37,7 +42,7 @@ public class MealController {
     @PostMapping("/add")
     public Meal create(@Valid @RequestBody Meal meal) {
         if (meal.getId() == 0) {
-            log.info("create", meal);
+            log.info("create {}", meal);
             return mealService.create(meal);
         } else {
             log.info("update {}", meal);
@@ -46,7 +51,9 @@ public class MealController {
     }
 
     @GetMapping("/{id}")
-    public Meal get(@PathVariable long id) {
+    public Meal get(@PathVariable long id, @AuthenticationPrincipal OAuth2User user) {
+
+        log.info( "\033[0;32m"+ "****************** {}" + "\033[0m", user.getAttribute("sub").toString());
         log.info("get meal {}", id);
         return mealService.get(id);
     }
@@ -76,7 +83,7 @@ public class MealController {
     @ExceptionHandler({NotFoundException.class, EmptyResultDataAccessException.class})
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
     public ResponseEntity<Object> handleException() {
-        return new ResponseEntity("meal not found", HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>("meal not found", HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -86,6 +93,6 @@ public class MealController {
                 .map(msg -> msg.getField() + " " + msg.getDefaultMessage())
                 .sorted()
                 .collect(Collectors.joining("\n"));
-        return new ResponseEntity(result, HttpStatus.NOT_ACCEPTABLE);
+        return new ResponseEntity<>(result, HttpStatus.NOT_ACCEPTABLE);
     }
 }
