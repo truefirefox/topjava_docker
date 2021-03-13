@@ -36,4 +36,8 @@ public class Meal{
     @NotBlank
     @Size(min = 2, max = 120)
     String description;
+
+    @Column(name = "email", nullable = false)
+    @Email
+    String email;
 }

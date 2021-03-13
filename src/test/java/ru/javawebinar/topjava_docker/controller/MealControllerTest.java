@@ -18,11 +18,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static ru.javawebinar.topjava_docker.controller.TestUtil.getConsumer;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class MealControllerTest {
+
     @Autowired
     protected WebApplicationContext context;
 
@@ -30,17 +32,10 @@ public class MealControllerTest {
     protected MockMvc mockMvc;
 
     @Test
-    public void shouldAuth() throws Exception {
-        this.mockMvc.perform(get("/api/user").with(oauth2Login()))
-                .andDo(print())
-                .andExpect(status().isOk());
-    }
-
-    @Test
     public void shouldUpdate() throws Exception {
         String mealToUpdate = Files.readString(Path.of("src/test/resources/update.json"));
         this.mockMvc.perform(
-                post("/meals/add").with(csrf()).with(oauth2Login())
+                post("/meals/add").with(csrf()).with(oauth2Login().attributes(getConsumer()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mealToUpdate))
                 .andDo(print())
@@ -53,7 +48,7 @@ public class MealControllerTest {
         String mealToSave = Files.readString(Path.of("src/test/resources/save.json"));
         String result = Files.readString(Path.of("src/test/resources/saveResult.json"));
         this.mockMvc.perform(
-                post("/meals/add").with(csrf()).with(oauth2Login())
+                post("/meals/add").with(csrf()).with(oauth2Login().attributes(getConsumer()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mealToSave))
                 .andDo(print())
@@ -65,8 +60,9 @@ public class MealControllerTest {
     @Test
     public void shouldGet() throws Exception {
         String result = Files.readString(Path.of("src/test/resources/get.json"));
+
         this.mockMvc.perform(
-                get("/meals/7").with(oauth2Login()))
+                get("/meals/7").with(oauth2Login().attributes(getConsumer())))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().json(result));
@@ -76,7 +72,7 @@ public class MealControllerTest {
     public void shouldGetAll() throws Exception {
         String result = Files.readString(Path.of("src/test/resources/getAll.json"));
         this.mockMvc.perform(
-                get("/meals").with(oauth2Login()))
+                get("/meals").with(oauth2Login().attributes(getConsumer())))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().json(result));
@@ -90,7 +86,7 @@ public class MealControllerTest {
                 .param("startTime", "19:00")
                 .param("endDate", "2020-01-31")
                 .param("endTime", "22:00")
-                .with(oauth2Login()))
+                .with(oauth2Login().attributes(getConsumer())))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().json(result));
@@ -102,7 +98,7 @@ public class MealControllerTest {
         this.mockMvc.perform(get("/meals/between")
                 .param("startDate", "2020-01-30")
                 .param("endTime", "22:00")
-                .with(oauth2Login()))
+                .with(oauth2Login().attributes(getConsumer())))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().json(result));
@@ -111,7 +107,7 @@ public class MealControllerTest {
     @Test
     public void shouldDelete() throws Exception {
         this.mockMvc.perform(
-                delete("/meals/7").with(csrf()).with(oauth2Login()))
+                delete("/meals/7").with(csrf()).with(oauth2Login().attributes(getConsumer())))
                 .andDo(print())
                 .andExpect(status().isNoContent());
     }
@@ -119,10 +115,10 @@ public class MealControllerTest {
     @Test
     public void shouldReturn404() throws Exception {
         this.mockMvc.perform(
-                delete("/meals/77").with(csrf()).with(oauth2Login()))
+                delete("/meals/77").with(csrf()).with(oauth2Login().attributes(getConsumer())))
                 .andDo(print())
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("meal not found"));
+                .andExpect(content().string("meal not found, id = 77"));
     }
 
     @Test
@@ -132,7 +128,7 @@ public class MealControllerTest {
                 "description must not be blank\n" +
                 "description size must be between 2 and 120";
         this.mockMvc.perform(
-                post("/meals/add").with(csrf()).with(oauth2Login())
+                post("/meals/add").with(csrf()).with(oauth2Login().attributes(getConsumer()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mealToUpdate))
                 .andDo(print())

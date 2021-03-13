@@ -16,7 +16,15 @@ public interface MealRepository extends PagingAndSortingRepository<Meal, Long> {
     @Transactional(readOnly = true)
     @Query("SELECT m from Meal m WHERE " +
             "(coalesce(:startDate, null) IS NULL OR m.date >= :startDate) AND " +
-            "(coalesce(:endDate, null) IS NULL OR m.date <= :endDate)")
-    Iterable<Meal> getBetweenHalfOpen(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate, Sort sort);
+            "(coalesce(:endDate, null) IS NULL OR m.date <= :endDate) AND m.email = :email")
+    Iterable<Meal> getBetweenHalfOpen(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate, String email, Sort sort);
 
+    @Transactional(readOnly = true)
+    Iterable<Meal> findAllByEmail(String email, Sort sort);
+
+    @Transactional(readOnly = true)
+    Meal findByIdAndEmail(long id, String email);
+
+    @Transactional
+    int deleteByIdAndEmail(long id, String email);
 }

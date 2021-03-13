@@ -6,6 +6,8 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ru.javawebinar.topjava_docker.exception.NotFoundException;
 import ru.javawebinar.topjava_docker.model.Meal;
 import ru.javawebinar.topjava_docker.repository.MealRepository;
 import ru.javawebinar.topjava_docker.to.MealTo;
@@ -29,36 +31,37 @@ public class MealService {
         this.mealRepository = mealRepository;
     }
 
-    public Meal update(Meal meal) {
-        Meal updatedMeal = create(meal);
-        checkNotFound(updatedMeal != null, meal.getId());
-        return updatedMeal;
+    @Transactional
+    public Meal update(Meal meal, String email) {
+        checkNotFound(get(meal.getId(), email) != null, meal.getId());
+        return create(meal, email);
     }
 
     @CacheEvict(value = "meals", allEntries = true)
-    public Meal create(Meal meal) {
+    public Meal create(Meal meal, String email) {
+        meal.setEmail(email);
         return mealRepository.save(meal);
     }
 
-    public Meal get(long id) {
-        Optional<Meal> meal = mealRepository.findById(id);
-        checkNotFound(meal.isPresent(), id);
-        return meal.get();
+    public Meal get(long id, String email) {
+        Meal meal = mealRepository.findByIdAndEmail(id, email);
+        checkNotFound(meal != null, id);
+        return meal;
     }
 
     @CacheEvict(value = "meals", allEntries = true)
-    public void delete(long id) {
-        mealRepository.deleteById(id);
+    public void delete(long id, String email) {
+        checkNotFound(mealRepository.deleteByIdAndEmail(id, email) > 0, id);
     }
 
     @Cacheable("meals")
-    public List<MealTo> getAll() {
-        Iterable<Meal> meals = mealRepository.findAll(SORT_BY_DATE_TIME);
+    public List<MealTo> getAll(String email) {
+        Iterable<Meal> meals = mealRepository.findAllByEmail(email, SORT_BY_DATE_TIME);
         return convert(meals, meal -> true);
     }
 
-    public List<MealTo> getBetween(LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) {
-        Iterable<Meal> meals = mealRepository.getBetweenHalfOpen(startDate, endDate, SORT_BY_DATE_TIME);
+    public List<MealTo> getBetween(LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime, String email) {
+        Iterable<Meal> meals = mealRepository.getBetweenHalfOpen(startDate, endDate, email, SORT_BY_DATE_TIME);
         Predicate<Meal> mealPredicate = meal ->
                 (startTime == null || meal.getTime().compareTo(startTime) >= 0) && (endTime == null || meal.getTime().compareTo(endTime) < 0);
         return convert(meals, mealPredicate);
@@ -66,7 +69,7 @@ public class MealService {
 
     private void checkNotFound(boolean isExist, long id) {
         if (!isExist) {
-            throw new RuntimeException("Not found entity with " + id);
+            throw new NotFoundException("meal not found, id = " + id);
         }
     }
 
